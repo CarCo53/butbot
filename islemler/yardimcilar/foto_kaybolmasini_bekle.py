@@ -1,6 +1,6 @@
-# gorev_yardimcilari/foto_kaybolmasini_bekle.py
-# GÜNCELLENDİ v4: Taşınabilirlik
-# 'sys.path' hack'i kaldırıldı.
+# islemler/yardimcilar/foto_kaybolmasini_bekle.py
+# GÜNCELLENDİ v5: 'islemler/yardimcilar' altındaki yeni yerine uyarlandı.
+# 'sys.path' ana dizin yolu (2 seviye yukarı) düzeltildi.
 
 import pyautogui
 import time
@@ -8,21 +8,23 @@ import os
 import sys
 
 # Kendi kütüphanemizden 'ara_ve_bekle' fonksiyonunu import ediyoruz
+# ('.', bu dosya ile aynı klasörde demektir)
 from .foto_ara_ve_bekle import ara_ve_bekle
 
-# Ana dizindeki özel hata tanımımızı import ediyoruz
+# --- GÜNCELLENEN YOL ---
+# Ana dizindeki (hatalar.py) özel hata tanımımızı import ediyoruz
 try:
     from hatalar import SistemiYenidenBaslatHatasi
 except ImportError:
-    # Eğer bu script, main.py tarafından çağrılmadıysa (örn: tek başına test),
-    # ana dizini sys.path'e eklemeyi dene.
+    # Eğer .py olarak çalıştırılırsa ve bulamazsa, ana dizini (2 seviye yukarı) eklemeyi dene
     try:
-        ANA_PROJE_DIZINI = os.path.join(os.path.dirname(__file__), '..')
+        ANA_PROJE_DIZINI = os.path.join(os.path.dirname(__file__), '..', '..') # <-- DEĞİŞTİ
         sys.path.append(ANA_PROJE_DIZINI)
         from hatalar import SistemiYenidenBaslatHatasi
     except ImportError:
         print("HATA: 'hatalar.py' dosyası ana dizinde bulunamadı.")
         sys.exit(1)
+# -------------------------
 
 
 def ara_ve_kaybolmasini_bekle(goruntu_tam_yolu,
@@ -32,6 +34,7 @@ def ara_ve_kaybolmasini_bekle(goruntu_tam_yolu,
     """
     Bir görüntünün önce EKRANA GELMESİNİ, sonra EKRANDAN KAYBOLMASINI bekler.
     Kaybolmazsa (donarsa), 'SistemiYenidenBaslatHatasi' fırlatır.
+    (İç mantık değişmedi)
     """
     goruntu_adi = os.path.basename(goruntu_tam_yolu)
     
