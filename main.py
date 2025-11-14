@@ -1,27 +1,44 @@
 # main.py
-# ANA ORKESTRA ŞEFİ v4
-# GÜNCELLENDİ: Artık başlangıç sayfasını SADECE BİR KEZ sorar
-# ve bu bilgiyi 'global' bir değişken olarak saklar.
+# ANA ORKESTRA ŞEFİ v8
+# GÜNCELLENDİ: Tüm importlar 'islemler' paket yapısına
+#               uyacak şekilde güncellendi.
 
 import time
 import os
 import subprocess
-import butunlesikgiris 
+import sys 
 
-from merkeziguncelleme import merkeziguncelleme
-
+# --- GÜNCELLENEN İMPORT YOLLARI ---
 try:
+    # 1. Giriş Modülü
+    from islemler.butunlesikgiris.butunlesikgiris import giris_yap_ve_dogrula
+    
+    # 2. Görev Modülü
+    from islemler.guncellemeler.merkeziguncelleme.merkeziguncelleme import calistir_merkezi_guncelleme
+    
+    # 3. Yardımcı Modül (Popup)
+    from islemler.yardimcilar.popup_sayi_sor import sor as popup_sor
+    
+    # 4. Kök Modüller (Ana dizinde oldukları için yolları değişmedi)
     from hatalar import SistemiYenidenBaslatHatasi
-except ImportError:
-    print("HATA: 'hatalar.py' dosyası ana dizinde bulunamadı.")
-    exit()
-
-# --- YENİ IMPORT: Soru sorma sorumluluğu artık 'main'de ---
-try:
-    from gorev_yardimcilari import popup_sayi_sor
-except ImportError:
-    print("HATA: 'popup_sayi_sor' kütüphanesi bulunamadı.")
-    exit()
+    
+except ImportError as e:
+    print(f"HATA: Gerekli bir modül import edilemedi: {e}")
+    print("Tüm modülleri 'islemler' klasörü altına taşıdığınızdan")
+    print("ve __init__.py dosyalarını eklediğinizden emin olun.")
+    
+    # Hata durumunda loglama (Derlenmiş .exe için)
+    try:
+        from config import EXE_DIZINI
+        log_path = os.path.join(EXE_DIZINI, "hata_logu.txt")
+        with open(log_path, "a") as f:
+            f.write(f"IMPORT HATASI: {e}\n")
+    except Exception:
+        pass # config'i bile bulamazsa yapacak bir şey yok
+        
+    os.system("pause")
+    sys.exit(1)
+# ------------------------------------
 
 
 def _force_kill_chrome_processes():
@@ -37,16 +54,14 @@ def _force_kill_chrome_processes():
     except Exception as e:
         print(f"Agresif Temizlik sırasında hata (sorun değil): {e}")
 
-# --- YENİ FONKSİYON: Kullanıcıdan Girdiyi Sadece Bir Kez Al ---
 def _kullanicidan_baslangic_sayfasini_iste():
     """
     Program ilk açıldığında kullanıcıya başlangıç sayfasını sorar.
-    Geçerli bir sayı (1 veya daha büyük) alana kadar tekrar deneyebilir
-    (veya varsayılanı kullanır).
     """
     print("Kullanıcıdan başlanacak sayfa/satır numarası isteniyor...")
     
-    baslangic_sayisi = popup_sayi_sor.sor(
+    # --- DEĞİŞİKLİK: Doğrudan import edilen 'sor' fonksiyonu çağrılıyor ---
+    baslangic_sayisi = popup_sor(
         baslik="Görev Başlangıcı",
         metin="Kaçıncı sayfadan/satırdan başlamak istiyorsunuz? (1'den başlayarak)"
     )
@@ -62,8 +77,6 @@ def _kullanicidan_baslangic_sayfasini_iste():
 def ana_program():
     print(">>> ANA PROGRAM BAŞLATILDI (Yeniden Başlatma Döngüsü Aktif) <<<")
     
-    # --- DEĞİŞİKLİK: Soru sorma işlemi 'while' döngüsünün DIŞINA alındı ---
-    # Bu kod, program boyunca SADECE BİR KEZ çalışacak.
     try:
         global_baslangic_sayisi = _kullanicidan_baslangic_sayfasini_iste()
     except Exception as e:
@@ -71,7 +84,6 @@ def ana_program():
         global_baslangic_sayisi = 1
 
     
-    # --- Yeniden Başlatma Döngüsü ---
     while True:
         driver = None
         browser_process = None
@@ -79,7 +91,8 @@ def ana_program():
         try:
             # --- GÖREV 1: GİRİŞ YAP ---
             print("\n--- Döngü Adımı: Giriş Modülü Çağrılıyor ---")
-            driver, browser_process = butunlesikgiris.giris_yap_ve_dogrula()
+            
+            driver, browser_process = giris_yap_ve_dogrula()
             
             if driver is None or browser_process is None:
                 print("Ana Program: Giriş modülü başarısız oldu. 1dk bekleyip tekrar denenecek.")
@@ -88,10 +101,10 @@ def ana_program():
 
             print("\n--- Ana Program: Giriş Başarılı. Görevler başlıyor... ---")
             
-            # --- GÖREV 2: MERKEZİ GÜNCELLEME ---
-            # --- DEĞİŞİKLİK: Hafızadaki 'global_baslangic_sayisi' parametre olarak aktarılıyor ---
             print(f"Merkezi Güncelleme modülü, {global_baslangic_sayisi}. sayfadan başlayacak şekilde çağrılıyor...")
-            gorev_basarili_mi = merkeziguncelleme.calistir_merkezi_guncelleme(
+            
+            # --- DEĞİŞİKLİK: Doğrudan import edilen 'calistir_merkezi_guncelleme' çağrılıyor ---
+            gorev_basarili_mi = calistir_merkezi_guncelleme(
                 baslangic_sayisi=global_baslangic_sayisi
             )
             
