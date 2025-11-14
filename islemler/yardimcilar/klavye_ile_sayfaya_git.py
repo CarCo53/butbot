@@ -1,29 +1,29 @@
-# gorev_yardimcilari/klavye_ile_sayfaya_git.py
-# GÜNCELLENDİ v2.1: Standart 120sn bekleme kuralı düzeltildi.
-#               'bekle_bilgi_mesaji' çağrısındaki özel süreler kaldırıldı.
+# islemler/yardimcilar/klavye_ile_sayfaya_git.py
+# GÜNCELLENDİ v10: Kök dizini (2 seviye yukarı) sys.path'e ekleme düzeltmesi yapıldı.
+# 'gorev_yardimcilari' olan eski hatalı import düzeltildi.
 
 import pyautogui
 import time
 import os
 import sys
 
-# --- Kütüphaneyi Dışarıdan Çağırma ---
-SCRIPT_DIZINI = os.path.dirname(__file__)
-ANA_PROJE_DIZINI = os.path.join(SCRIPT_DIZINI, '..')
-sys.path.append(ANA_PROJE_DIZINI)
-
+# --- DÜZELTME: Kök Dizini sys.path'e ekle ---
 try:
-    from gorev_yardimcilari import foto_tikla
-    from gorev_yardimcilari import islem_bekle
-except ImportError:
-    print("HATA: Gerekli 'gorev_yardimcilari' kütüphaneleri bulunamadı.")
-    sys.exit(1)
-
-try:
+    # Bu dosyanın bulunduğu dizinden 2 seviye yukarı çık (kök dizine)
+    ANA_PROJE_DIZINI = os.path.join(os.path.dirname(__file__), '..', '..')
+    if ANA_PROJE_DIZINI not in sys.path:
+        sys.path.append(ANA_PROJE_DIZINI)
+    
+    # Artık 'islemler' paketini ve kök dizin modüllerini import edebiliriz
+    from islemler.yardimcilar import foto_tikla
+    from islemler.yardimcilar import islem_bekle
     from hatalar import SistemiYenidenBaslatHatasi
-except ImportError:
-    print("HATA: 'hatalar.py' dosyası ana dizinde bulunamadı.")
+    
+except ImportError as e:
+    print(f"HATA: 'klavye_ile_sayfaya_git' başlatılırken import hatası: {e}")
+    print("     Kök dizin (config.py'nin olduğu yer) yola eklenemedi.")
     sys.exit(1)
+# --- Düzeltme Sonu ---
 
 
 # Fonksiyon tanımından 'img_bilgi_mesaji_yolu' parametresi kaldırıldı

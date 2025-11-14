@@ -1,6 +1,5 @@
 # islemler/yardimcilar/foto_kaybolmasini_bekle.py
-# GÜNCELLENDİ v5: 'islemler/yardimcilar' altındaki yeni yerine uyarlandı.
-# 'sys.path' ana dizin yolu (2 seviye yukarı) düzeltildi.
+# GÜNCELLENDİ v10: Kök dizini (2 seviye yukarı) sys.path'e ekleme düzeltmesi yapıldı.
 
 import pyautogui
 import time
@@ -11,19 +10,16 @@ import sys
 # ('.', bu dosya ile aynı klasörde demektir)
 from .foto_ara_ve_bekle import ara_ve_bekle
 
-# --- GÜNCELLENEN YOL ---
-# Ana dizindeki (hatalar.py) özel hata tanımımızı import ediyoruz
+# --- DÜZELTME: Kök Dizini sys.path'e ekle ---
 try:
+    # Bu dosyanın bulunduğu dizinden 2 seviye yukarı çık (kök dizine)
+    ANA_PROJE_DIZINI = os.path.join(os.path.dirname(__file__), '..', '..')
+    if ANA_PROJE_DIZINI not in sys.path:
+        sys.path.append(ANA_PROJE_DIZINI)
     from hatalar import SistemiYenidenBaslatHatasi
 except ImportError:
-    # Eğer .py olarak çalıştırılırsa ve bulamazsa, ana dizini (2 seviye yukarı) eklemeyi dene
-    try:
-        ANA_PROJE_DIZINI = os.path.join(os.path.dirname(__file__), '..', '..') # <-- DEĞİŞTİ
-        sys.path.append(ANA_PROJE_DIZINI)
-        from hatalar import SistemiYenidenBaslatHatasi
-    except ImportError:
-        print("HATA: 'hatalar.py' dosyası ana dizinde bulunamadı.")
-        sys.exit(1)
+    print("HATA: 'hatalar.py' dosyası ana dizinde bulunamadı.")
+    sys.exit(1)
 # -------------------------
 
 

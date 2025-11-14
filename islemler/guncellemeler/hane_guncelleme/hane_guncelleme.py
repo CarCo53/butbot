@@ -1,43 +1,33 @@
 # islemler/guncellemeler/hane_guncelleme/hane_guncelleme.py
-# GÜNCELLENDİ v4: 'islemler' paketi altındaki yeni yerine uyarlandı.
-# Tüm importlar ve resim yolları düzeltildi.
+# GÜNCELLENDİ v10: Kök dizini (3 seviye yukarı) sys.path'e ekleme düzeltmesi yapıldı.
 
 import os
 import sys
 import time
 import pyautogui
 
-# --- Kütüphaneyi Dışarıdan Çağırma (Yol Düzeltildi) ---
-# Bu dosya artık 'islemler/guncellemeler/hane_guncelleme' içinde
-SCRIPT_DIZINI = os.path.dirname(__file__)
-ANA_PROJE_DIZINI = os.path.join(SCRIPT_DIZINI, '..', '..', '..') # 3 seviye yukarı
-sys.path.append(ANA_PROJE_DIZINI)
-
+# --- DÜZELTME: Kök Dizini sys.path'e ekle ---
 try:
-    # --- GÜNCELLENEN İMPORT YOLLARI (YARDIMCILAR) ---
+    # Bu dosyanın bulunduğu dizinden 3 seviye yukarı çık (kök dizine)
+    ANA_PROJE_DIZINI = os.path.join(os.path.dirname(__file__), '..', '..', '..')
+    if ANA_PROJE_DIZINI not in sys.path:
+        sys.path.append(ANA_PROJE_DIZINI)
+    
+    # Artık 'islemler' paketini ve kök dizin modüllerini import edebiliriz
     from islemler.yardimcilar import foto_ara_ve_bekle, foto_tikla
     from islemler.yardimcilar.foto_kaybolmasini_bekle import ara_ve_kaybolmasini_bekle
     from islemler.yardimcilar.foto_birini_bekle import ara_ve_bul
     from islemler.yardimcilar import islem_bekle
-except ImportError:
-    print("HATA: 'islemler/yardimcilar' kütüphanesi bulunamadı.")
-    sys.exit(1)
-
-try:
     from hatalar import SistemiYenidenBaslatHatasi
-except ImportError:
-    print("HATA: 'hatalar.py' dosyası ana dizinde bulunamadı.")
-    sys.exit(1)
-
-# --- GÜNCELLENEN GÖRÜNTÜ YOLLARI (CONFIG'DEN ALINIYOR) ---
-try:
     from config import (
         HG_MERKEZI_GUNCELLE, HG_BILGI_MESAJI, HG_MESAJ, HG_KAPAT,
         HG_SUNUCU_HATA, HG_KAPAT2
     )
-except ImportError:
-    print("HATA: config.py'den 'HG_' (Hane Güncelleme) yolları okunamadı.")
+except ImportError as e:
+    print(f"HATA: 'hane_guncelleme' başlatılırken import hatası: {e}")
+    print("     Kök dizin (config.py'nin olduğu yer) yola eklenemedi.")
     sys.exit(1)
+# --- Düzeltme Sonu ---
 
 
 def calistir_hane_guncelleme():

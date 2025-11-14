@@ -1,23 +1,20 @@
 # islemler/yardimcilar/islem_bekle.py
-# GÜNCELLENDİ v5: 'islemler/yardimcilar' altındaki yeni yerine uyarlandı.
-# 'sys.path' ana dizin yolu (2 seviye yukarı) düzeltildi.
+# GÜNCELLENDİ v10: Kök dizini (2 seviye yukarı) sys.path'e ekleme düzeltmesi yapıldı.
 
 import sys
 import os
 
-# --- Gerekli Kütüphaneleri ve Yolları Import Et ---
-# 'config.py'yi (ana dizinde) bulmak için sys.path ayarı
+# --- DÜZELTME: Kök Dizini sys.path'e ekle ---
 try:
+    # Bu dosyanın bulunduğu dizinden 2 seviye yukarı çık (kök dizine)
+    ANA_PROJE_DIZINI = os.path.join(os.path.dirname(__file__), '..', '..')
+    if ANA_PROJE_DIZINI not in sys.path:
+        sys.path.append(ANA_PROJE_DIZINI)
     from config import IMG_BILGI_MESAJI_YOLU
 except ImportError:
-    try:
-        # --- GÜNCELLENEN YOL ---
-        ANA_PROJE_DIZINI = os.path.join(os.path.dirname(__file__), '..', '..') # 2 seviye yukarı
-        sys.path.append(ANA_PROJE_DIZINI)
-        from config import IMG_BILGI_MESAJI_YOLU
-    except ImportError:
-        print("HATA: config.py (IMG_BILGI_MESAJI_YOLU) bulunamadı.")
-        sys.exit(1)
+    print("HATA: config.py (IMG_BILGI_MESAJI_YOLU) bulunamadı.")
+    sys.exit(1)
+# --- Düzeltme Sonu ---
 
 try:
     # Kendi kütüphanemizdeki (aynı klasördeki) ana bekleme fonksiyonunu import et

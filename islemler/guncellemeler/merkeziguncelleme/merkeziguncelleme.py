@@ -1,23 +1,21 @@
 # islemler/guncellemeler/merkeziguncelleme/merkeziguncelleme.py
 # YÖNETİCİ GÖREV MODÜLÜ
-# GÜNCELLENDİ: v8 - 'islemler' paketi altındaki yeni yerine uyarlandı.
-#               Tüm importlar ve resim yolları düzeltildi.
+# GÜNCELLENDİ: v12 - Görünmez özel boşluk karakterleri (non-breaking space) temizlendi.
 
 import os
 import sys
 import time
 import pyautogui
-from collections import Counter 
+from collections import Counter
 
-# --- Kütüphaneyi Dışarıdan Çağırma (Yol Düzeltildi) ---
-# Bu dosya artık 'islemler/guncellemeler/merkeziguncelleme' içinde
-SCRIPT_DIZINI = os.path.dirname(__file__)
-ANA_PROJE_DIZINI = os.path.join(SCRIPT_DIZINI, '..', '..', '..') # 3 seviye yukarı
-sys.path.append(ANA_PROJE_DIZINI)
-
-# --- GÜNCELLENEN İMPORT YOLLARI ---
+# --- DÜZELTME: Kök Dizini sys.path'e ekle ---
 try:
-    # 1. Yardımcı Modüller (yeni 'yardimcilar' yolu)
+    # Bu dosyanın bulunduğu dizinden 3 seviye yukarı çık (kök dizine)
+    ANA_PROJE_DIZINI = os.path.join(os.path.dirname(__file__), '..', '..', '..')
+    if ANA_PROJE_DIZINI not in sys.path:
+        sys.path.append(ANA_PROJE_DIZINI)
+    
+    # 1. Yardımcı Modüller (artık 'islemler' paketinden)
     from islemler.yardimcilar import foto_ara_ve_bekle, foto_tikla
     from islemler.yardimcilar.foto_kaybolmasini_bekle import ara_ve_kaybolmasini_bekle
     from islemler.yardimcilar.foto_tumunu_bul import bul_tumunu
@@ -25,13 +23,13 @@ try:
     from islemler.yardimcilar import klavye_ile_sayfaya_git
     from islemler.yardimcilar import islem_bekle
     
-    # 2. Kardeş Görev Modülü (guncellemeler altında)
+    # 2. Kardeş Görev Modülü (artık 'islemler' paketinden)
     from islemler.guncellemeler.hane_guncelleme import hane_guncelleme
     
-    # 3. Kök Modüller (Ana dizinden)
+    # 3. Kök Modüller (artık kök dizinden)
     from hatalar import SistemiYenidenBaslatHatasi
     
-    # 4. Config (Tüm resim yolları için)
+    # 4. Config (artık kök dizinden)
     from config import (
         MG_SOSYAL_GUNCEL_OLMAYAN, MG_SOSYAL_ANA_EKRAN, MG_ISLEMLER,
         MG_SAYFA_SAYISI_HESAPLA, MG_SORGULAMA_GIZLE, MG_HANE,
@@ -40,13 +38,9 @@ try:
     
 except ImportError as e:
     print(f"HATA: 'merkeziguncelleme' başlatılırken import hatası: {e}")
-    print("     Lütfen 'islemler' klasör yapısını ve __init__.py dosyalarını kontrol edin.")
+    print("     Kök dizin (config.py'nin olduğu yer) yola eklenemedi.")
     sys.exit(1)
-# ------------------------------------
-
-
-# --- Görüntü Dosyalarının Tam Yolları ---
-# (Tüm yerel IMG_... tanımlamaları kaldırıldı, artık config'den geliyorlar)
+# --- Düzeltme Sonu ---
 
 
 def _dongu_baslangic_noktasi():
@@ -58,7 +52,7 @@ def _dongu_baslangic_noktasi():
     print("Merkezi Guncelleme: ANA HANE DÖNGÜSÜ BAŞLANGIÇ NOKTASI.")
     print("-----------------------------------------------------")
     
-    sayfa_numarasi = 1 
+    sayfa_numarasi = 1
     
     while True:
         print(f"\n--- Sayfa {sayfa_numarasi} İşleniyor ---")
@@ -84,7 +78,7 @@ def _dongu_baslangic_noktasi():
 
             except Exception as e:
                 print(f"HATA: Hane X-koordinat filtrelemesi başarısız: {e}")
-                return False 
+                return False
         
         for i, hane_konumu in enumerate(filtrelenmis_haneler):
             print(f"\n--- Hane {i+1}/{len(filtrelenmis_haneler)} (Sayfa {sayfa_numarasi}) işleniyor (Konum: {hane_konumu}) ---")
@@ -92,7 +86,7 @@ def _dongu_baslangic_noktasi():
             try:
                 print(f"Hane {i+1}'e tıklanıyor...")
                 pyautogui.click(int(hane_konumu.x), int(hane_konumu.y))
-                time.sleep(1) 
+                time.sleep(1)
 
                 print("'hane_guncelleme' uzman modülü çağrılıyor...")
                 guncelleme_basarili_mi = hane_guncelleme.calistir_hane_guncelleme()
@@ -101,9 +95,9 @@ def _dongu_baslangic_noktasi():
                     print(f"UYARI: Hane {i+1} güncellenemedi (3 deneme de başarısız oldu).")
                 
                 print(f"Hane {i+1} için işlem bitti. '{os.path.basename(MG_HANEDEN_CIK)}' aranıyor...")
-                if not foto_tikla.tikla(MG_HANEDEN_CIK, 
-                                         konum="sag_ust", 
-                                         maks_bekleme_saniyesi=10, 
+                if not foto_tikla.tikla(MG_HANEDEN_CIK,
+                                         konum="sag_ust",
+                                         maks_bekleme_saniyesi=10,
                                          offset=10):
                     
                     raise Exception(f"KRİTİK HATA: '{os.path.basename(MG_HANEDEN_CIK)}' butonu bulunamadı.")
@@ -120,19 +114,19 @@ def _dongu_baslangic_noktasi():
         print(f"\n--- Sayfa {sayfa_numarasi} tamamlandı. ---")
         print(f"'{os.path.basename(MG_SONRAKI)}' butonu aranıyor...")
         
-        if foto_tikla.tikla(MG_SONRAKI, 
-                             konum="sol_ust", 
+        if foto_tikla.tikla(MG_SONRAKI,
+                             konum="sol_ust",
                              maks_bekleme_saniyesi=5,
                              offset=5):
             
             print("Sonraki sayfaya tıklandı. Yeni sayfanın yüklenmesi bekleniyor...")
             sayfa_numarasi += 1
-            time.sleep(5) 
+            time.sleep(5)
             continue
             
         else:
             print("Tüm sayfalar tamamlandı ('sonraki.png' bulunamadı).")
-            break 
+            break
             
     print("\n--- Tüm Haneler ve Sayfalar İşlendi ---")
     return True
@@ -170,7 +164,7 @@ def calistir_merkezi_guncelleme(baslangic_sayisi):
         # Adım 6: 'Sorgulama_kriterlerini_gizle.png' tıkla
         if not foto_tikla.tikla(MG_SORGULAMA_GIZLE, maks_bekleme_saniyesi=10):
             raise Exception(f"'{os.path.basename(MG_SORGULAMA_GIZLE)}' butonu bulunamadı.")
-        time.sleep(1) 
+        time.sleep(1)
 
         # Adım 7: (Soru sorma) 'main.py'ye taşınmıştı.
         
@@ -180,7 +174,7 @@ def calistir_merkezi_guncelleme(baslangic_sayisi):
         print(f"'{os.path.basename(MG_SAYFAYAGIT)}' kullanılarak {baslangic_sayisi}. sayfaya/satıra gidiliyor...")
         
         if not klavye_ile_sayfaya_git.git(
-            sayfa_numarasi=asagi_ok_sayisi, 
+            sayfa_numarasi=asagi_ok_sayisi,
             img_sayfa_git_yolu=MG_SAYFAYAGIT
         ):
             raise Exception("Klavye ile sayfaya gitme işlemi başarısız oldu.")

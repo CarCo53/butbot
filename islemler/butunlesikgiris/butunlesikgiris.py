@@ -1,6 +1,5 @@
 # islemler/butunlesikgiris/butunlesikgiris.py
-# GÜNCELLENDİ v8: Artık 'yardimcilar' paketini
-# 'islemler.yardimcilar' olarak yeni yolundan import ediyor.
+# GÜNCELLENDİ: v10 - Kök dizini (2 seviye yukarı) sys.path'e ekleme düzeltmesi yapıldı.
 
 import os
 import time
@@ -22,34 +21,26 @@ except ImportError:
     print("HATA: 'pip install pyautogui pygetwindow' ile kütüphaneleri kurun.")
     exit()
 
-# config.py'yi (ana dizinde) bulmak için sys.path ayarı
+# --- DÜZELTME: Kök Dizini sys.path'e ekle ---
 try:
+    # Bu dosyanın bulunduğu dizinden 2 seviye yukarı çık (kök dizine)
+    ANA_PROJE_DIZINI = os.path.join(os.path.dirname(__file__), '..', '..')
+    if ANA_PROJE_DIZINI not in sys.path:
+        sys.path.append(ANA_PROJE_DIZINI)
+    
+    # Artık kök dizindeki modülleri import edebiliriz
     from config import (
         DRIVER_YOLU_PAKETLI, CHROME_EXE_YOLU_DIS, ENV_YOLU_DIS,
         BG_IZIN_VER_YOLU, BG_ANASAYFA_YOLU
     )
-except ImportError:
-    # Eğer .py olarak çalıştırılırsa ve bulamazsa, ana dizini eklemeyi dene
-    try:
-        ANA_PROJE_DIZINI = os.path.join(os.path.dirname(__file__), '..', '..')
-        sys.path.append(ANA_PROJE_DIZINI)
-        from config import (
-            DRIVER_YOLU_PAKETLI, CHROME_EXE_YOLU_DIS, ENV_YOLU_DIS,
-            BG_IZIN_VER_YOLU, BG_ANASAYFA_YOLU
-        )
-    except ImportError:
-        print("HATA: config.py bulunamadı.")
-        sys.exit(1)
-
-
-# --- GÜNCELLENEN İMPORT YOLU (YARDIMCILAR İÇİN) ---
-try:
+    # Ve 'islemler' paketindeki diğer modülleri
     from islemler.yardimcilar.foto_ara_ve_bekle import ara_ve_bekle
-except ImportError:
-    print("HATA: 'islemler/yardimcilar/foto_ara_ve_bekle.py' kütüphanesi bulunamadı.")
-    print("     'gorev_yardimcilari' klasörünü 'islemler/yardimcilar' olarak taşıdınız mı?")
+    
+except ImportError as e:
+    print(f"HATA: 'butunlesikgiris' başlatılırken import hatası: {e}")
+    print("     Kök dizin (config.py'nin olduğu yer) yola eklenemedi.")
     sys.exit(1)
-# -----------------------------------------------
+# --- Düzeltme Sonu ---
 
 
 # --- Ayarlar (config'den geliyor, değişiklik yok) ---
