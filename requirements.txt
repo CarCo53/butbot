@@ -1,0 +1,9 @@
+# requirements.txt
+pyinstaller
+selenium
+python-dotenv
+psutil
+pyautogui
+pillow
+opencv-python
+pygetwindow
