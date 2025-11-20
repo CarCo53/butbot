@@ -1,5 +1,4 @@
 # islemler/butunlesikgiris/butunlesikgiris.py
-# GÜNCELLENDİ: v10 - Kök dizini (2 seviye yukarı) sys.path'e ekleme düzeltmesi yapıldı.
 
 import os
 import time
@@ -56,7 +55,7 @@ KULLANICI_ADI_ID = "j_username"
 SIFRE_ID = "j_password"
 LOGIN_BUTON_NAME = "login"
 FLASH_LINK_PARTIAL_TEXT = "Adobe Flash player" 
-ANA_SAYFA_BEKLEME_SURESI = 60
+ANA_SAYFA_BEKLEME_SURESI = 260
 _IZIN_VER_BUTON_YOLU = BG_IZIN_VER_YOLU
 _ANA_SAYFA_YOLU = BG_ANASAYFA_YOLU
 

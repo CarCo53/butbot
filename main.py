@@ -2,11 +2,22 @@
 # ANA ORKESTRA ŞEFİ v8
 # GÜNCELLENDİ: Tüm importlar 'islemler' paket yapısına
 #               uyacak şekilde güncellendi.
+# GÜNCELLENDİ v9: Arayüz Paneli eklendi.
 
 import time
 import os
 import subprocess
 import sys 
+
+# --- YENİ ARAYÜZ İMPORTLARI ---
+try:
+    from arayuz.panel import StatusPanel
+    from arayuz.redirector import redirect_stdout_to_panel
+except ImportError as e:
+    print(f"HATA: Arayüz modülü 'arayuz' klasöründe bulunamadı: {e}")
+    sys.exit(1)
+# ------------------------------------
+
 
 # --- GÜNCELLENEN İMPORT YOLLARI ---
 try:
@@ -75,6 +86,28 @@ def _kullanicidan_baslangic_sayfasini_iste():
 
 
 def ana_program():
+    # --- YENİ EKLENDİ: PANELİ BAŞLAT ---
+    # Not: Paneli, henüz log yönlendirilmeden önce,
+    # try/except bloğunun dışında başlatıyoruz.
+    panel = None
+    try:
+        # Son 2 satırı gösterecek paneli başlat
+        panel = StatusPanel(max_lines=2)
+        panel.start()
+        
+        # Panelin başlaması için kısa bir süre bekle
+        time.sleep(1) 
+        
+        # Tüm print() çıktılarını bu panele yönlendir
+        redirect_stdout_to_panel(panel)
+    
+    except Exception as e:
+        # Panel başlatılamazsa, orijinal stdout'a yaz
+        print(f"KRİTİK HATA: Arayüz paneli başlatılamadı: {e}", file=sys.__stdout__)
+        # panel 'None' olarak kalacak ve program normal devam edecek
+        # (loglar sadece konsola gidecek)
+        
+    # --- ESKİ KOD (HİÇ DEĞİŞMEDİ) ---
     print(">>> ANA PROGRAM BAŞLATILDI (Yeniden Başlatma Döngüsü Aktif) <<<")
     
     try:
@@ -136,6 +169,12 @@ def ana_program():
                 browser_process.terminate()
             _force_kill_chrome_processes()
             print("Temizlik tamamlandı. Döngü devam ediyor...")
+            
+    # --- YENİ EKLENDİ: PROGRAM BİTTİĞİNDE PANELİ KAPAT ---
+    # 'while' döngüsü kırıldığında (break ile) veya ana_program bittiğinde
+    # panelin güvenle kapatılması gerekir.
+    if panel:
+        panel.stop()
 
 # --- Programı Başlat ---
 if __name__ == "__main__":
